@@ -1,1 +1,39 @@
-$primary: red;
+@import './variables';  // Assuming variables.scss is in the same directory
+
+body {
+    font-family: 'Lato', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    color: $dark;
+}
+
+nav li:last-child a {
+    background: $primary;
+     width: 30%;
+    // height: 30%;
+    &:hover {
+        background: $primary-hover;
+    }
+}
+
+nav li a {
+    transition: $smooth;
+    &:hover {
+        color: $primary;
+    }
+}
+section.hero{
+    background:$secondary ;
+}
+.size{
+    background: $secondary;
+}
+.add-to-cart{
+    border: 2px solid $primary;
+    color: $primary;
+    transition: $smooth;
+    &:hover{
+        background-color: $primary;
+        border-color: $pure;
+        color: $pure;
+    }
+}
