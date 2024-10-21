@@ -3,6 +3,9 @@ const flash = require('express-flash')
 const User = require('../../models/user')
 const bcrypt = require('bcrypt')
 function authcontroller() {
+    const _getRedirectUrl = (req) => {
+        return req.user.role === 'admin' ? '/admin/orders' : '/customer/orders'
+    }
     return{
         login(req, res) {
             res.render('auth/login')
@@ -12,8 +15,7 @@ function authcontroller() {
             //validate request
             if(!email || !password){
                 req.flash('error','All fields are required')
-                
-                return res.redirect('/register')
+                return res.redirect('/login')
             }
             passport.authenticate('local',(err,user,info) => {
                  if(err){
@@ -30,7 +32,7 @@ function authcontroller() {
                         return next(err)
                     }
 
-                    return res.redirect('/')
+                    return res.redirect(_getRedirectUrl(req))
                  })
             })(req,res,next)
 
@@ -81,14 +83,15 @@ function authcontroller() {
 
             
         },
-        async  logout(req, res, next){
+        logout(req, res, next) {
             req.logout(function(err) {
                 if (err) {
-                    return next(err); // Pass the error to the next middleware
+                    return next(err); // Passes error to the next middleware if something goes wrong
                 }
-                res.redirect('/login'); // Redirect to login page after logout
+                req.flash('success', 'You are logged out');
+                res.redirect('/login');
             });
-        }
+        },
         
         
         

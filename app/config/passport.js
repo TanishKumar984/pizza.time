@@ -38,7 +38,7 @@ function init(passport) {
         try {
             const user = await User.findById(id);
             done(null, user);
-        } catch (err) {
+        }catch (err) {
             done(err);
         }
     });
