@@ -9,6 +9,7 @@ const session = require('express-session');
 const passport = require('passport');
 const flash = require('express-flash');
 const MongoDbStore = require('connect-mongo');
+const Emitter = require('events')
 
 const PORT = process.env.PORT || 5500;
 
@@ -30,6 +31,9 @@ let mongoStore = MongoDbStore.create({
     mongoUrl: 'mongodb://localhost:27017/pizza',
     collectionName: 'sessions'
 });
+
+const eventEmitter = new Emitter()
+app.set('eventEmitter', eventEmitter)
 
 // Session middleware
 app.use(session({
@@ -71,6 +75,22 @@ app.set('view engine', 'ejs');
 require('./routes/web')(app);
 
 // Start server
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`listening on port ${PORT}`);
 });
+
+const io = require('socket.io')(server)
+io.on('connection', (socket) => {
+      // Join
+      socket.on('join', (orderId) => {
+        socket.join(orderId)
+      })
+})
+
+eventEmitter.on('orderUpdated', (data) => {
+    io.to(`order_${data.id}`).emit('orderUpdated', data)
+})
+
+eventEmitter.on('orderPlaced', (data) => {
+    io.to('adminRoom').emit('orderPlaced', data)
+})
